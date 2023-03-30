@@ -129,3 +129,6 @@ dmypy.json
 .pyre/
 
 .vscode
+
+buiding_company_create.sql
+building_company_insert.sql
