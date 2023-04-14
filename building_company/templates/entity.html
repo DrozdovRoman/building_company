@@ -1,60 +1,29 @@
 {% extends "base.html" %}
-{% block title %}Главная страница{% endblock %} 
-{% block header %}Список сущностей{% endblock %} 
+{% block title %}{{table_name}}{% endblock %} 
+{% block header %}{{table_name}}{% endblock %} 
 {%block content %}
-
-<style>
-    #entity {
-      font-size: 1.2em;
-    }
-    footer {
-      text-align: center;
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      padding: 10px 0;
-    }
-  </style>
-
-<style>
-    body {
-      margin: 0;
-      padding: 0;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    main {
-      flex: 1;
-    }
+<table class="table table-striped">
+	<thead>
+	  <tr>
+		{% for column in columns %}
+		{% for element in column %}
+		<th scope="col">#</th>
+		<th scope="col">{{element}}</th>
+		{% endfor %}
+		{% endfor %}
+	  </tr>
+	</thead>
+	<tbody>
+		{% for row in rows %}
+	  <tr>
+		<th scope="row">{{ forloop.counter }}</th>
+		{% for element in row %}
+		<td>{{element}}</td>
+		{% endfor %}
+	  </tr>
+	{% endfor %}
+	</tbody>
+  </table>
 
 
-  </style>
-
-<ul id="entity">
-    <li><a href="#" class="text-dark">Строительные управления</a></li>
-    <li><a href="#" class="text-dark">Участок</a></li>
-    <li><a href="#" class="text-dark">Персонал</a></li>
-    <li><a href="#" class="text-dark">Специальность</a></li>
-    <li><a href="#" class="text-dark">Тип должности</a></li>
-    <li><a href="#" class="text-dark">Бригада</a></li>
-    <li><a href="#" class="text-dark">Персонал бригады</a></li>
-    <li><a href="#" class="text-dark">График работы</a></li>
-    <li><a href="#" class="text-dark">Смета</a></li>
-    <li><a href="#" class="text-dark">Смета факт</a></li>
-    <li><a href="#" class="text-dark">Материал технологии</a></li>
-    <li><a href="#" class="text-dark">Характеристика объекта</a></li>
-    <li><a href="#" class="text-dark">Технология объекта</a></li>
-    <li><a href="#" class="text-dark">Справочник характеристик</a></li>
-    <li><a href="#" class="text-dark">Справочник материалов</a></li>
-    <li><a href="#" class="text-dark">Тип объекта</a></li>
-    <li><a href="#" class="text-dark">Строительный объект</a></li>
-    <li><a href="#" class="text-dark">Договор</a></li>
-    <li><a href="#" class="text-dark">Заказчик</a></li>
-    <li><a href="{% url 'equipment_type' %}" class="text-dark">Тип техники</a></li>
-    <li><a href="#" class="text-dark">Техника управления</a></li>
-    <li><a href="#" class="text-dark">Техника строительного объекта</a></li>
-</ul>
 {% endblock %}
