@@ -5,11 +5,9 @@
 <table class="table table-striped">
 	<thead>
 	  <tr>
-		{% for column in columns %}
-		{% for element in column %}
 		<th scope="col">#</th>
-		<th scope="col">{{element}}</th>
-		{% endfor %}
+		{% for column in columns %}
+		<th scope="col">{{column}}</th>
 		{% endfor %}
 	  </tr>
 	</thead>
