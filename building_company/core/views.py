@@ -123,13 +123,12 @@ class ConstructionView(EntityView):
     )
 
 
-class ConstructionEmployeeView(EntityView):
-    table_name = 'construction_employee'
-    table_alias = 'Персонал договоры'
+class RegionView(EntityView):
+    table_name = 'region'
+    table_alias = 'Участок'
     column_name = (
-        'Номер договора', 'ID работника', 'Строительное управление',
-        'Дата подписания договора', 'Дата окончания договора',
-        'Зарплата')
+        'Кадастровый номер', 'Номер управления', 'ID Начальника участка',
+        'Площадь (кв.м)',)
 
 # def equipment_type(request):
 #     try:

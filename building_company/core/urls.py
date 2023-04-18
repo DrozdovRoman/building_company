@@ -3,7 +3,7 @@ from django.urls import path
 from . import views
 from .views import EquipmentTypeView, PositionTypeView, SpecializationView
 from .views import ObjectTypeView, CustomerView, EmployeeView, ConstructionView
-from .views import ConstructionEmployeeView
+from .views import ConstructionEmployeeView, RegionView
 urlpatterns = [
     path('', views.index, name='index'),
     path('entity/', views.entity, name='entity'),
@@ -35,7 +35,7 @@ urlpatterns = [
          ConstructionView.as_view(),
          name='construction'),
 
-    path('construction-employee/',
-         ConstructionEmployeeView.as_view(),
-         name='ConstructionEmployee'),
+    path('region/',
+         RegionView.as_view(),
+         name='region'),
 ]
