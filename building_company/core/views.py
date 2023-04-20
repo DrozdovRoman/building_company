@@ -80,16 +80,24 @@ class EquipmentTypeView(EntityView):
     column_name = ('Название техники', )
 
 
-class PositionTypeView(EntityView):
-    table_name = 'position_type'
-    table_alias = 'Тип специальности'
-    column_name = ('Тип должности', )
+class EquipmentConstructionTypeView(EntityView):
+    table_name = 'equipment_construction'
+    table_alias = 'Техника строительного управления'
+    column_name = (
+        'Тип техники', 'Номер строительного управления',
+        'Количество (ед.)')
 
 
 class SpecializationView(EntityView):
     table_name = 'specialization'
     table_alias = 'Специальность'
-    column_name = ('Название специальности', 'Тип должности', )
+    column_name = ('Название специальности', )
+
+
+class EngineeringPositionView(EntityView):
+    table_name = 'engineering_position'
+    table_alias = 'Тип инженерно-технической должности'
+    column_name = ('Название должности', )
 
 
 class ObjectTypeView(EntityView):
@@ -112,7 +120,7 @@ class EmployeeView(EntityView):
     column_name = (
         'ID', 'Имя', 'Фамилия',
         'Дата рождения', 'Электронная почта',
-        'Номер телефона', 'Должность')
+        'Номер телефона', 'Специальность', 'Техническая должность')
 
 
 class ConstructionView(EntityView):
@@ -130,6 +138,28 @@ class RegionView(EntityView):
         'Кадастровый номер', 'Номер управления', 'ID Начальника участка',
         'Площадь (кв.м)',)
 
+
+class BrigadeView(EntityView):
+    table_name = 'brigade'
+    table_alias = 'Бригада'
+    column_name = (
+        'Номер бригады', 'ID бригадира',)
+
+
+class BrigadeEmployeeView(EntityView):
+    table_name = 'brigade_employee'
+    table_alias = 'Персонал бригады'
+    column_name = (
+        'ID работника бригады', 'Номер бригады', )
+
+
+class BuildingView(EntityView):
+    table_name = 'building'
+    table_alias = 'Строительный объект'
+    column_name = (
+        'Номер строительного объекта', 'Тип объекта',
+        'Кадастровый номер участка'
+    )
 # def equipment_type(request):
 #     try:
 #         with connection.cursor() as cursor:
