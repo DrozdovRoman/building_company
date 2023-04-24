@@ -160,6 +160,43 @@ class BuildingView(EntityView):
         'Номер строительного объекта', 'Тип объекта',
         'Кадастровый номер участка'
     )
+
+
+class ContractView(EntityView):
+    table_name = 'contract'
+    table_alias = 'Договор строительства объекта'
+    column_name = (
+        'Номер договора', 'Номер объекта',
+        'Заказчик', 'Дата подписания',
+        'Дата сдачи', 'Стоимость работ'
+    )
+
+
+class QualityView(EntityView):
+    table_name = 'quality'
+    table_alias = 'Характеристика'
+    column_name = (
+        'Название',
+    )
+
+
+class ObjectQualityView(EntityView):
+    table_name = 'object_quality'
+    table_alias = 'Характеристики объекта'
+    column_name = (
+        'ID', 'Тип объекта',
+        'Характеристика', 'Еденица измерения',
+        'Количество', 'Комментарий'
+    )
+
+
+class TechnologyView(EntityView):
+    table_name = 'technology'
+    table_alias = 'Технология'
+    column_name = (
+        'Название',
+    )
+
 # def equipment_type(request):
 #     try:
 #         with connection.cursor() as cursor:
