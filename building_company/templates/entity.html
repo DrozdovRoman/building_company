@@ -5,7 +5,7 @@
 <table class="table table-striped">
 	<thead>
 	  <tr>
-		<th scope="col">#</th>
+		<!-- <th scope="col">#</th> -->
 		{% for column in columns %}
 		<th scope="col">{{column}}</th>
 		{% endfor %}
@@ -14,7 +14,7 @@
 	<tbody>
 		{% for row in rows %}
 	  <tr>
-		<th scope="row">{{ forloop.counter }}</th>
+		<!-- <th scope="row">{{ forloop.counter }}</th> -->
 		{% for element in row %}
 		<td>{{element}}</td>
 		{% endfor %}

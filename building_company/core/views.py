@@ -197,6 +197,43 @@ class TechnologyView(EntityView):
         'Название',
     )
 
+
+class MaterialView(EntityView):
+    table_name = 'material'
+    table_alias = 'Материал'
+    column_name = (
+        'Название',
+    )  
+
+
+class ObjectTechnologyView(EntityView):
+    table_name = 'object_technology'
+    table_alias = 'Технология объекта'
+    column_name = (
+        'ID',
+        'Тип объекта',
+        'Технология',
+    )
+
+
+class TechnologyMaterialView(EntityView):
+    table_name = 'technology_material'
+    table_alias = 'Материалы технологии'
+    column_name = (
+        'Название материала',
+        'Технология'
+    )
+
+
+class EquipmentBuildingView(EntityView):
+    table_name = 'equipment_building'
+    table_alias = 'Техника строительного объекта'
+    column_name = (
+        'ID', 'Строительный объект',
+        'Тип Техники', 'Строительной управление',
+        'Кол-во техники', 'Дата начала работ',
+        'Дата окончания работ'
+    )
 # def equipment_type(request):
 #     try:
 #         with connection.cursor() as cursor:

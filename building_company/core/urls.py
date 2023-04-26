@@ -6,7 +6,9 @@ from .views import ObjectTypeView, CustomerView, EmployeeView, ConstructionView
 from .views import RegionView, SpecializationView, BrigadeView
 from .views import BrigadeEmployeeView, EquipmentConstructionTypeView
 from .views import BuildingView, ContractView, QualityView
-from .views import ObjectQualityView, TechnologyView
+from .views import ObjectQualityView, TechnologyView, MaterialView
+from .views import ObjectTechnologyView, TechnologyMaterialView
+from .views import EquipmentBuildingView
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -75,4 +77,20 @@ urlpatterns = [
     path('technology/',
          TechnologyView.as_view(),
          name='technology'),
+
+    path('material/',
+         MaterialView.as_view(),
+         name='material'),
+
+    path('object-technology/',
+         ObjectTechnologyView.as_view(),
+         name='object_technology'),
+
+    path('technology-material/',
+         TechnologyMaterialView.as_view(),
+         name='technology_material'),
+
+    path('equipment-building/',
+         EquipmentBuildingView.as_view(),
+         name='equipment_building'),
 ]

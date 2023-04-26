@@ -14,18 +14,18 @@
     <li><a href="#" class="text-dark">График работы</a></li>
     <li><a href="#" class="text-dark">Смета</a></li>
     <li><a href="#" class="text-dark">Смета факт</a></li>
-    <li><a href="#" class="text-dark">Материал технологии</a></li>
+    <li><a href="{% url 'technology_material' %}" class="text-dark">Материал технологии</a></li>
     <li><a href="{% url 'object_quality' %}" class="text-dark">Характеристика объекта</a></li>
-    <li><a href="#" class="text-dark">Технология объекта</a></li>
+    <li><a href="{% url 'object_technology' %}" class="text-dark">Технология объекта</a></li>
     <li><a href="{% url 'quality' %}" class="text-dark">Справочник характеристик</a></li>
     <li><a href="{% url 'technology' %}" class="text-dark">Справочник технологий</a></li>
-    <li><a href="#" class="text-dark">Справочник материалов</a></li>
+    <li><a href="{% url 'material' %}" class="text-dark">Справочник материалов</a></li>
     <li><a href="{% url 'object_type' %}" class="text-dark">Тип объекта</a></li>
     <li><a href="{% url 'building' %}" class="text-dark">Строительный объект</a></li>
     <li><a href="{% url 'contract' %}" class="text-dark">Договор</a></li>
     <li><a href="{% url 'customer' %}" class="text-dark">Заказчик</a></li>
     <li><a href="{% url 'equipment_type' %}" class="text-dark">Тип техники</a></li>
     <li><a href="{% url 'equipment_construction' %}" class="text-dark">Техника управления</a></li>
-    <li><a href="#" class="text-dark">Техника строительного объекта</a></li>
+    <li><a href="{% url 'equipment_building' %}" class="text-dark">Техника строительного объекта</a></li>
 </ul>
 {% endblock %}
