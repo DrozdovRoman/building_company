@@ -8,11 +8,12 @@ from .views import BrigadeEmployeeView, EquipmentConstructionTypeView
 from .views import BuildingView, ContractView, QualityView
 from .views import ObjectQualityView, TechnologyView, MaterialView
 from .views import ObjectTechnologyView, TechnologyMaterialView
-from .views import EquipmentBuildingView
+from .views import EquipmentBuildingView, TimetableView, EstimationView
+from .views import EstimationFactView
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('entity/', views.entity, name='entity'),
+    path('entity/', views.entities, name='entity'),
 
     path('equipment-type/',
          EquipmentTypeView.as_view(),
@@ -93,4 +94,16 @@ urlpatterns = [
     path('equipment-building/',
          EquipmentBuildingView.as_view(),
          name='equipment_building'),
+
+    path('timetable/',
+         TimetableView.as_view(),
+         name='timetable'),
+
+    path('estimation/',
+         EstimationView.as_view(),
+         name='estimation'),
+
+    path('estimation-fact/',
+         EstimationFactView.as_view(),
+         name='estimation_fact'),
 ]

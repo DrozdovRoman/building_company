@@ -9,7 +9,11 @@ def index(request):
     return render(request, "index.html")
 
 
-def entity(request):
+def entities(request):
+    return render(request, "entities.html")
+
+
+def tasks(request):
     return render(request, "entities.html")
 
 
@@ -234,6 +238,42 @@ class EquipmentBuildingView(EntityView):
         'Кол-во техники', 'Дата начала работ',
         'Дата окончания работ'
     )
+
+
+class TimetableView(EntityView):
+    table_name = 'timetable'
+    table_alias = 'Расписание'
+    column_name = (
+        'ID', 'Строительный объект',
+        'Технология', 'Номер бригады',
+        'Дата начала', 'Дата окончания',
+        'Дата начала факт', 'Дата окончания факт',
+    )
+
+
+class EstimationView(EntityView):
+    table_name = 'estimation'
+    table_alias = 'Смета'
+    column_name = (
+        'ID', 'Материал',
+        'Расписание ID', 'Еденица измерения',
+        'Кол-во', 'Цена',
+        'Примечание'
+    )
+
+
+class EstimationFactView(EntityView):
+    table_name = 'estimation_fact'
+    table_alias = 'Смета факт'
+    column_name = (
+        'ID', 'Материал',
+        'Расписание ID', 'Еденица измерения',
+        'Кол-во', 'Цена',
+        'Примечание'
+    )
+
+
+
 # def equipment_type(request):
 #     try:
 #         with connection.cursor() as cursor:
