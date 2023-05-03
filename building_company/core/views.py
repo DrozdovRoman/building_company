@@ -5,6 +5,18 @@ from django.db import connection
 from django.http import Http404
 
 
+def execute_raw_sql(query):
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(query)
+            rows = cursor.fetchall()
+    except ProgrammingError:
+        rows = None
+    finally:
+        cursor.close()
+        return rows
+
+
 def index(request):
     return render(request, "index.html")
 
@@ -14,7 +26,152 @@ def entities(request):
 
 
 def tasks(request):
-    return render(request, "entities.html")
+    return render(request, "tasks.html")
+
+
+def task1(request):
+    table_name = 'Задание 1'
+    table1_rows = execute_raw_sql(
+        '''
+    SELECT construction.id, string_agg(first_name || ' ' || last_name, '')
+    as director_names
+    FROM construction
+    INNER JOIN employee ON construction.director = employee.id
+    GROUP BY construction.id;''')
+
+    table2_rows = execute_raw_sql(
+        '''
+    SELECT region.cadastral_number,
+    string_agg(first_name || ' ' || last_name, '') as chief_names
+    FROM region
+    INNER JOIN employee ON region.chief = employee.id
+    GROUP BY region.cadastral_number;''')
+
+    table1_columns = (
+        'Номер строительного управления',
+        'ФИО Руководителя'
+    )
+    table2_columns = (
+        'Кадастровый номер участка',
+        'ФИО Руководителя'
+    )
+    return render(request,
+                  'task/task1.html',
+                  {'table_name': table_name,
+                   'table1_columns': table1_columns,
+                   'table2_columns': table2_columns,
+                   'table1_rows': table1_rows,
+                   'table2_rows': table2_rows})
+
+
+def task2(request):
+    table_name = 'Задание 2'
+    table1_rows = execute_raw_sql(
+        '''
+    SELECT construction.id, string_agg(first_name || ' ' || last_name, '')
+    as director_names
+    FROM construction
+    INNER JOIN employee ON construction.director = employee.id
+    GROUP BY construction.id;''')
+
+    table2_rows = execute_raw_sql(
+        '''
+    SELECT region.cadastral_number,
+    string_agg(first_name || ' ' || last_name, '') as chief_names
+    FROM region
+    INNER JOIN employee ON region.chief = employee.id
+    GROUP BY region.cadastral_number;''')
+
+    table1_columns = (
+        'Номер строительного управления',
+        'ФИО Руководителя'
+    )
+    table2_columns = (
+        'Кадастровый номер участка',
+        'ФИО Руководителя'
+    )
+    return render(request,
+                  'task/task1.html',
+                  {'table_name': table_name,
+                   'table1_columns': table1_columns,
+                   'table2_columns': table2_columns,
+                   'table1_rows': table1_rows,
+                   'table2_rows': table2_rows})
+
+
+def task3(request):
+    table_name = 'Задание 2'
+    table1_rows = execute_raw_sql(
+        '''
+    SELECT construction.id, string_agg(first_name || ' ' || last_name, '')
+    as director_names
+    FROM construction
+    INNER JOIN employee ON construction.director = employee.id
+    GROUP BY construction.id;''')
+
+    table2_rows = execute_raw_sql(
+        '''
+    SELECT region.cadastral_number,
+    string_agg(first_name || ' ' || last_name, '') as chief_names
+    FROM region
+    INNER JOIN employee ON region.chief = employee.id
+    GROUP BY region.cadastral_number;''')
+
+    table1_columns = (
+        'Номер строительного управления',
+        'ФИО Руководителя'
+    )
+    table2_columns = (
+        'Кадастровый номер участка',
+        'ФИО Руководителя'
+    )
+    return render(request,
+                  'task/task1.html',
+                  {'table_name': table_name,
+                   'table1_columns': table1_columns,
+                   'table2_columns': table2_columns,
+                   'table1_rows': table1_rows,
+                   'table2_rows': table2_rows})
+
+
+def task4(request):
+    pass
+
+
+def task5(request):
+    pass
+
+
+def task6(request):
+    pass
+
+
+def task7(request):
+    pass
+
+
+def task8(request):
+    pass
+
+
+def task9(request):
+    pass
+
+
+def task10(request):
+    pass
+
+
+def task11(request):
+    pass
+
+
+def task12(request):
+    pass
+
+
+def task13(request):
+    pass
 
 
 class EntityView(View):
@@ -271,29 +428,3 @@ class EstimationFactView(EntityView):
         'Кол-во', 'Цена',
         'Примечание'
     )
-
-
-
-# def equipment_type(request):
-#     try:
-#         with connection.cursor() as cursor:
-#             data = 'SELECT * FROM equipment_type'
-
-#             column_name = '''SELECT column_name
-#             \nFROM information_schema.columns
-#             \nWHERE table_name = 'equipment_type' '''
-
-#             cursor.execute(column_name)
-#             columns = cursor.fetchall()
-#             print(column_name)
-
-#             cursor.execute(data)
-#             rows = cursor.fetchall()
-#             print(data)
-#     finally:
-#         cursor.close()
-
-#     return render(
-#         request,
-#         'entity.html',
-#         {'columns': columns, 'rows': rows})

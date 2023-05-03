@@ -132,3 +132,6 @@ dmypy.json
 
 buiding_company_create.sql
 building_company_insert.sql
+building_company_select.sql
+building_company_grant.sql
+building_company_create_user.sql
