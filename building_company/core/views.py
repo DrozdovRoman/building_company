@@ -17,6 +17,25 @@ def execute_raw_sql(query):
         return rows
 
 
+def table_exist(table_name: str, pk_name: str, id, is_string: bool) -> bool:
+    if is_string:
+        query = f'''
+        SELECT COUNT(*)
+        FROM {table_name}
+        WHERE {pk_name} = '{id}'
+        '''
+    else:
+        query = f'''
+        SELECT COUNT(*)
+        FROM {table_name}
+        WHERE {pk_name} = {id}
+        '''
+    if execute_raw_sql(query)[0][0] == 0:
+        return False
+    else:
+        return True
+
+
 def index(request):
     return render(request, "index.html")
 
@@ -66,92 +85,405 @@ def task1(request):
 
 def task2(request):
     table_name = 'Задание 2'
-    table1_rows = execute_raw_sql(
-        '''
-    SELECT construction.id, string_agg(first_name || ' ' || last_name, '')
-    as director_names
-    FROM construction
-    INNER JOIN employee ON construction.director = employee.id
-    GROUP BY construction.id;''')
-
-    table2_rows = execute_raw_sql(
-        '''
-    SELECT region.cadastral_number,
-    string_agg(first_name || ' ' || last_name, '') as chief_names
-    FROM region
-    INNER JOIN employee ON region.chief = employee.id
-    GROUP BY region.cadastral_number;''')
-
-    table1_columns = (
-        'Номер строительного управления',
-        'ФИО Руководителя'
-    )
-    table2_columns = (
-        'Кадастровый номер участка',
-        'ФИО Руководителя'
-    )
     return render(request,
-                  'task/task1.html',
+                  'task/task2.html',
+                  {'table_name': table_name})
+
+
+def task2_result(request):
+    region = request.GET.get('region')
+    construction = request.GET.get('construction')
+    if region is not None:
+        table_name = "Участок"
+        if not table_exist(table_name='region', pk_name='cadastral_number',
+                           id=region, is_string=True):
+            raise Http404('Участка с данным номером не существует')
+
+        table_columns = (
+            'Руководитель',
+            'Должность'
+        )
+
+        table_rows = execute_raw_sql(f'''
+        SELECT string_agg(first_name || ' ' || last_name, '') as chief_names,
+        employee.engineering_position_name
+        FROM employee
+        INNER JOIN region ON region.chief = employee.id
+        WHERE cadastral_number = '{region}'
+        GROUP BY engineering_position_name
+        ''')
+
+    if construction is not None:
+        table_name = "Строительное управление"
+        if not table_exist(table_name='construction', pk_name='id',
+                           id=construction, is_string=False):
+            raise Http404('Участка с данным номером не существует')
+
+        table_columns = (
+            'Руководитель',
+            'Должность'
+        )
+
+        table_rows = execute_raw_sql(f'''
+        SELECT string_agg(first_name || ' ' || last_name, '') as chief_names,
+        region.chief AS comparison_field
+        FROM employee
+        JOIN region ON region.chief = employee.id
+        WHERE region.construction_id = {construction}
+        GROUP BY region.chief
+        UNION
+        SELECT string_agg(first_name || ' ' || last_name, '')
+        as director_names,
+        construction.director AS comparison_field
+        FROM employee
+        JOIN construction ON construction.director = employee.id
+        WHERE construction.id = {construction}
+        GROUP BY construction.director;
+        ''')
+
+    return render(request,
+                  'task/result.html',
                   {'table_name': table_name,
-                   'table1_columns': table1_columns,
-                   'table2_columns': table2_columns,
-                   'table1_rows': table1_rows,
-                   'table2_rows': table2_rows})
+                   'table_columns': table_columns,
+                   'table_rows': table_rows})
 
 
 def task3(request):
-    table_name = 'Задание 2'
-    table1_rows = execute_raw_sql(
-        '''
-    SELECT construction.id, string_agg(first_name || ' ' || last_name, '')
-    as director_names
-    FROM construction
-    INNER JOIN employee ON construction.director = employee.id
-    GROUP BY construction.id;''')
-
-    table2_rows = execute_raw_sql(
-        '''
-    SELECT region.cadastral_number,
-    string_agg(first_name || ' ' || last_name, '') as chief_names
-    FROM region
-    INNER JOIN employee ON region.chief = employee.id
-    GROUP BY region.cadastral_number;''')
-
-    table1_columns = (
-        'Номер строительного управления',
-        'ФИО Руководителя'
-    )
-    table2_columns = (
-        'Кадастровый номер участка',
-        'ФИО Руководителя'
-    )
+    table_name = 'Задание 3'
     return render(request,
-                  'task/task1.html',
+                  'task/task3.html',
+                  {'table_name': table_name})
+
+
+def task3_result(request):
+    region = request.GET.get('region')
+    construction = request.GET.get('construction')
+    if region is not None:
+        table_name = "Участок"
+        if not table_exist(table_name='region', pk_name='cadastral_number',
+                           id=region, is_string=True):
+            raise Http404('Участка с данным номером не существует')
+
+        table_columns = (
+            'Строительный объект',
+            'Название технологии',
+            'Номер бригады',
+            'Дата начала',
+            'Дата окончания',
+            'Факт начало',
+            'Факт конец',
+        )
+
+        table_rows = execute_raw_sql(f'''
+        SELECT timetable.building_id, object_technology.technology_id,
+        timetable.brigade_id, timetable.date_technology_start,
+        timetable.date_technology_end, timetable.date_technology_fact_start,
+        timetable.date_technology_fact_end
+        FROM region
+        INNER JOIN building ON region.cadastral_number = building.region_id
+        INNER JOIN timetable ON building.id = timetable.building_id
+        INNER JOIN object_technology ON
+        object_technology.id = timetable.object_technology_id
+        WHERE cadastral_number = '{region}'
+        ORDER BY timetable.building_id, timetable.date_technology_start
+        ''')
+
+    if construction is not None:
+        table_name = "Строительное управление"
+        if not table_exist(table_name='construction', pk_name='id',
+                           id=construction, is_string=False):
+            raise Http404('Участка с данным номером не существует')
+
+        table_columns = (
+            'Строительный объект',
+            'Название технологии',
+            'Номер бригады',
+            'Дата начала',
+            'Дата окончания',
+            'Факт начало',
+            'Факт конец',
+        )
+
+        table_rows = execute_raw_sql(f'''
+        SELECT timetable.building_id, object_technology.technology_id,
+        timetable.brigade_id, timetable.date_technology_start,
+        timetable.date_technology_end, timetable.date_technology_fact_start,
+        timetable.date_technology_fact_end
+        FROM construction
+        INNER JOIN region ON construction.id = region.construction_id
+        INNER JOIN building ON region.cadastral_number = building.region_id
+        INNER JOIN timetable ON building.id = timetable.building_id
+        INNER JOIN object_technology ON
+        object_technology.id = timetable.object_technology_id
+        WHERE construction.id = {construction}
+        ORDER BY timetable.building_id, timetable.date_technology_start
+        ''')
+
+    return render(request,
+                  'task/result.html',
                   {'table_name': table_name,
-                   'table1_columns': table1_columns,
-                   'table2_columns': table2_columns,
-                   'table1_rows': table1_rows,
-                   'table2_rows': table2_rows})
+                   'table_columns': table_columns,
+                   'table_rows': table_rows})
 
 
 def task4(request):
-    pass
+    table_name = 'Задание 4'
+    return render(request,
+                  'task/task4.html',
+                  {'table_name': table_name})
+
+
+def task4_result(request):
+    building = request.GET.get('building')
+
+    if building is not None:
+        table_name = "Строительный объект"
+        if not table_exist(table_name='building', pk_name='id',
+                           id=building, is_string=False):
+            raise Http404('Участка с данным номером не существует')
+
+        table_columns = (
+            'Номер бригады',
+            'Имя',
+            'Фамилия',
+            'Должность',
+            'Начальник бригады',
+        )
+
+        table_rows = execute_raw_sql(f'''
+        SELECT brigade_id, first_name,
+        last_name, specialization_name, brigade_chief
+        FROM (
+        SELECT brigade_employee.brigade_id,
+        employee.first_name, employee.last_name,
+        employee.specialization_name, '-'::text as brigade_chief
+        FROM timetable
+        INNER JOIN brigade ON timetable.brigade_id = brigade.id
+        INNER JOIN brigade_employee ON brigade.id = brigade_employee.brigade_id
+        INNER JOIN employee ON brigade_employee.employee_id = employee.id
+        WHERE timetable.building_id = {building}
+        GROUP BY brigade_employee.brigade_id, employee.first_name,
+        employee.last_name, employee.specialization_name
+        UNION
+        SELECT brigade.id, employee.first_name, employee.last_name,
+        employee.specialization_name, '+'::text as brigade_chief
+        FROM timetable
+        INNER JOIN brigade ON timetable.brigade_id = brigade.id
+        INNER JOIN employee ON brigade.supervisor = employee.id
+        WHERE timetable.building_id = {building}
+        GROUP BY brigade.id, employee.first_name,
+        employee.last_name, employee.specialization_name
+        ) AS result
+        ORDER BY brigade_id, first_name;
+        ''')
+
+    return render(request,
+                  'task/result.html',
+                  {'table_name': table_name,
+                   'table_columns': table_columns,
+                   'table_rows': table_rows})
 
 
 def task5(request):
-    pass
+    table_name = 'Задание 5'
+    return render(request,
+                  'task/task5.html',
+                  {'table_name': table_name})
+
+
+def task5_result(request):
+    construction = request.GET.get('construction')
+
+    if construction is not None:
+        table_name = "Строительное управление"
+        if not table_exist(table_name='construction', pk_name='id',
+                           id=construction, is_string=False):
+            raise Http404('Участка с данным номером не существует')
+
+        table_columns = (
+            'Тип техники',
+            'Количество ',
+        )
+
+        table_rows = execute_raw_sql(f'''
+        SELECT equipment_type_id, count
+        FROM equipment_construction
+        WHERE construction_id = {construction}
+        ORDER BY equipment_type_id
+        ''')
+
+    return render(request,
+                  'task/result.html',
+                  {'table_name': table_name,
+                   'table_columns': table_columns,
+                   'table_rows': table_rows})
 
 
 def task6(request):
-    pass
+    table_name = 'Задание 6'
+    return render(request,
+                  'task/task6.html',
+                  {'table_name': table_name})
+
+
+def task6_result(request):
+    building = request.GET.get('building')
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    if building is not None:
+        table_name = "Строительный объект"
+        if not table_exist(table_name='building', pk_name='id',
+                           id=building, is_string=False):
+            raise Http404('Участка с данным номером не существует')
+
+        table_columns = (
+            'Тип техники',
+            'Количество ',
+            'Дата начала работ',
+            'Дата окончания работ'
+        )
+
+        table_rows = execute_raw_sql(f'''
+        SELECT equipment_type_id, count,
+        sign_date, commissioning_date
+        FROM equipment_building
+        WHERE building_id = {building} AND
+        sign_date >= '{start_date}' AND
+        commissioning_date <= '{end_date}'
+        ''')
+
+    return render(request,
+                  'task/result.html',
+                  {'table_name': table_name,
+                   'table_columns': table_columns,
+                   'table_rows': table_rows})
 
 
 def task7(request):
-    pass
+    table_name = 'Задание 7'
+    return render(request,
+                  'task/task7.html',
+                  {'table_name': table_name})
+
+
+def task7_result(request):
+    building = request.GET.get('building')
+
+    if building is not None:
+        table_name = "Строительный объект"
+        if not table_exist(table_name='building', pk_name='id',
+                           id=building, is_string=False):
+            raise Http404('Участка с данным номером не существует')
+
+        table1_columns = (
+            'Технология',
+            'Номер бригады',
+            'Дата начала',
+            'Дата окончания',
+        )
+
+        table1_rows = execute_raw_sql(f'''
+        SELECT object_technology.technology_id, timetable.brigade_id,
+        timetable.date_technology_start, timetable.date_technology_end
+        FROM timetable
+        INNER JOIN object_technology ON
+        timetable.object_technology_id = object_technology.id
+        WHERE timetable.building_id = {building}
+        ''')
+
+        table2_columns = (
+            'Технология',
+            'Материал',
+            'Единица измерения',
+            'Количество',
+            'Цена',
+            'Примечание'
+        )
+
+        table2_rows = execute_raw_sql(f'''
+        SELECT object_technology.technology_id,
+        estimation.material_id, estimation.count,
+        estimation.unit, estimation.price,
+        estimation.note
+        FROM timetable
+        INNER JOIN object_technology ON
+        timetable.object_technology_id = object_technology.id
+        INNER JOIN estimation ON timetable.id = estimation.timetable_id
+        WHERE timetable.building_id = {building}
+        ''')
+
+    return render(request,
+                  'task/result_task7.html',
+                  {'table_name': table_name,
+                   'table1_columns': table1_columns,
+                   'table1_rows': table1_rows,
+                   'table2_columns': table2_columns,
+                   'table2_rows': table2_rows})
 
 
 def task8(request):
-    pass
+    table_name = 'Задание 8'
+    return render(request,
+                  'task/task8.html',
+                  {'table_name': table_name})
+
+
+def task8_result(request):
+    building = request.GET.get('building')
+
+    if building is not None:
+        table_name = "Строительный объект"
+        if not table_exist(table_name='building', pk_name='id',
+                           id=building, is_string=False):
+            raise Http404('Участка с данным номером не существует')
+
+        table1_columns = (
+            'Технология',
+            'Номер бригады',
+            'Дата начала факт',
+            'Дата окончания факт',
+        )
+
+        table1_rows = execute_raw_sql(f'''
+        SELECT object_technology.technology_id,
+        timetable.brigade_id, timetable.date_technology_fact_start,
+        timetable.date_technology_fact_end
+        FROM timetable
+        INNER JOIN object_technology ON
+        timetable.object_technology_id = object_technology.id
+        WHERE timetable.building_id = {building}
+        ''')
+
+        table2_columns = (
+            'Технология',
+            'Материал',
+            'Единица измерения',
+            'Количество факт',
+            'Цена факт',
+            'Примечание'
+        )
+
+        table2_rows = execute_raw_sql(f'''
+        SELECT object_technology.technology_id,
+        estimation_fact.material_id, estimation_fact.count,
+        estimation_fact.unit, estimation_fact.price,
+        estimation_fact.note
+        FROM timetable
+        INNER JOIN object_technology ON
+        timetable.object_technology_id = object_technology.id
+        INNER JOIN estimation_fact ON
+        timetable.id = estimation_fact.timetable_id
+        WHERE timetable.building_id = {building}
+        ''')
+
+    return render(request,
+                  'task/result_task8.html',
+                  {'table_name': table_name,
+                   'table1_columns': table1_columns,
+                   'table1_rows': table1_rows,
+                   'table2_columns': table2_columns,
+                   'table2_rows': table2_rows})
 
 
 def task9(request):
@@ -364,7 +696,7 @@ class MaterialView(EntityView):
     table_alias = 'Материал'
     column_name = (
         'Название',
-    )  
+    )
 
 
 class ObjectTechnologyView(EntityView):

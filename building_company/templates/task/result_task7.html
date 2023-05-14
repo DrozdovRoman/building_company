@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ table_name }}
+{% endblock %}
+
+{% block header %}
+{{ table_name }}
+{% endblock %}
+
+{% block content %}
+    <style>
+    .table-container {
+      display: none;
+    }
+    </style>
+    
+    <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" onchange="showTable(this)">
+      <option value="">Выберите пункт</option>
+      <option value="table1">График работ строительного объекта</option>
+      <option value="table2">Смета строительного объекта</option>
+    </select>
+    
+    <div id="table1" class="table-container">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            {% for column in table1_columns %}
+            <th scope="col">{{ column }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in table1_rows %}
+          <tr>
+            {% for element in row %}
+            <td>{{ element }}</td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    
+    <div id="table2" class="table-container">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            {% for column in table2_columns %}
+            <th scope="col">{{ column }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in table2_rows %}
+          <tr>
+            {% for element in row %}
+            <td>{{ element }}</td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    
+    <script>
+    function showTable(selectElement) {
+      var tableContainers = document.getElementsByClassName('table-container');
+      for (var i = 0; i < tableContainers.length; i++) {
+        tableContainers[i].style.display = 'none';
+      }
+    
+      var selectedTable = document.getElementById(selectElement.value);
+      if (selectedTable) {
+        selectedTable.style.display = 'block';
+      }
+    }
+    </script>
+{% endblock %}
