@@ -1,0 +1,96 @@
+{% extends "base.html" %} 
+
+{% block title %}
+{{ table_name }} 
+
+{% endblock %} 
+{% block header %}
+{{ table_name }}
+{% endblock %}
+
+{% block content %}
+<style>
+  .table-container {
+    display: none;
+  }
+</style>
+
+<form action="{% url 'task_9_result' %}" method="get">
+  <div class="form-group">
+    <label for="construction">Строительное управление</label>
+    <input
+      type="number"
+      id="construction"
+      name="construction"
+      class="form-control"
+      min="0"
+    />
+  </div>
+  <div class="form-group">
+  <p>Название работ</p>
+  <select
+    class="form-select form-select-lg mb-3"
+    aria-label=".form-select-lg example"
+    name="technology_name"
+    onchange="showTable(this)"
+  >
+    <option value="">Выберите пункт</option>
+    {% for row in rows %} {% for element in row %}
+    <option value="{{ element }}">{{ element }}</option>
+    {% endfor %} {% endfor %}
+  </select>
+  </div>
+  <div class="form-group">
+    <label for="start-date">Начальная дата</label>
+    <input
+      type="text"
+      id="start-date"
+      name="start_date"
+      class="form-control"
+      required
+    />
+  </div>
+  <div class="form-group">
+    <label for="end-date">Конечная дата</label>
+    <input
+      type="text"
+      id="end-date"
+      name="end_date"
+      class="form-control"
+      required
+    />
+  </div>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+<script>
+  function showTable(selectElement) {
+    var tableContainers = document.getElementsByClassName("table-container");
+    for (var i = 0; i < tableContainers.length; i++) {
+      tableContainers[i].style.display = "none";
+    }
+
+    var selectedTable = document.getElementById(selectElement.value);
+    if (selectedTable) {
+      selectedTable.style.display = "block";
+    }
+  }
+</script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+
+<script>
+  $(document).ready(function () {
+    $("#start-date, #end-date").datepicker({
+      format: "yyyy-mm-dd",
+      autoclose: true,
+      todayHighlight: true,
+    });
+  });
+</script>
+
+{% endblock %}

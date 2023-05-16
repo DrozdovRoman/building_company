@@ -13,8 +13,14 @@
             <a class="nav-link" href="{% url 'entity' %}">Список сущностей</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'tasks' %}">Запросы к информационной системе</a>
+            <a class="nav-link" href="{% url 'tasks' %}">Запросы к информационной системе </a>
           </li>
+            <a class="p-2 nav-link">{% if user.is_authenticated %}
+            Пользователь: {{ user.username }}.</a>
+            <a class="p-2 nav-link" href="{% url 'logout' %}">Выйти</a>
+            {% else %}
+            <a class="p-2 nav-link" href="{% url 'login' %}">Войти</a>
+            {% endif %}
         </ul>
       </div>
     </div>

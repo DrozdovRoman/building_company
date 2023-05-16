@@ -3,6 +3,9 @@ from django.shortcuts import render
 from django.db import ProgrammingError
 from django.db import connection
 from django.http import Http404
+from django.views.generic import CreateView
+from django.urls import reverse_lazy
+from .forms import CreationForm
 
 
 def execute_raw_sql(query):
@@ -34,6 +37,12 @@ def table_exist(table_name: str, pk_name: str, id, is_string: bool) -> bool:
         return False
     else:
         return True
+
+
+class SignUp(CreateView):
+    form_class = CreationForm
+    success_url = reverse_lazy("login")
+    template_name = "signup.html"
 
 
 def index(request):
@@ -487,23 +496,363 @@ def task8_result(request):
 
 
 def task9(request):
-    pass
+    table_name = 'Задание 9'
+    rows = execute_raw_sql('''
+    SELECT name FROM technology
+    ''')
+    return render(request,
+                  'task/task9.html',
+                  {'table_name': table_name,
+                   'rows': rows})
+
+
+def task9_result(request):
+    if not request.GET.get('construction') is None:
+        construction = request.GET.get('construction')
+    technology_name = request.GET.get('technology_name')
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    if construction is not None:
+        table_name = "Строительный объект"
+        if not table_exist(table_name='construction', pk_name='id',
+                           id=construction, is_string=False):
+            raise Http404('Участка с данным номером не существует')
+
+        table_columns = (
+            'Строительный объект',
+            'Номер бригады',
+            'Дата начала работ',
+            'Дата окончания работ',
+        )
+
+        if request.GET.get('construction') is None:
+            table_rows = execute_raw_sql(f'''
+            SELECT timetable.building_id, timetable.brigade_id,
+            timetable.date_technology_start, timetable.date_technology_end
+            FROM construction
+            INNER JOIN region ON construction.id = region.construction_id
+            INNER JOIN building ON region.cadastral_number = building.region_id
+            INNER JOIN timetable ON building.id = timetable.building_id
+            INNER JOIN object_technology ON
+            timetable.object_technology_id = object_technology.id
+            WHERE object_technology.technology_id = '{technology_name}' AND
+            date_technology_start >= '{start_date}' AND
+            date_technology_end <= '{end_date}'
+            ''')
+        else:
+            table_rows = execute_raw_sql(f'''
+            SELECT timetable.building_id, timetable.brigade_id,
+            timetable.date_technology_start, timetable.date_technology_end
+            FROM construction
+            INNER JOIN region ON construction.id = region.construction_id
+            INNER JOIN building ON region.cadastral_number = building.region_id
+            INNER JOIN timetable ON building.id = timetable.building_id
+            INNER JOIN object_technology ON
+            timetable.object_technology_id = object_technology.id
+            WHERE object_technology.technology_id = '{technology_name}' AND
+            date_technology_start >= '{start_date}' AND
+            date_technology_end <= '{end_date}' AND
+            construction.id = {construction}
+            ''')
+
+    return render(request,
+                  'task/result.html',
+                  {'table_name': table_name,
+                   'table_columns': table_columns,
+                   'table_rows': table_rows})
 
 
 def task10(request):
-    pass
+    table_name = 'Задание 10'
+    return render(request,
+                  'task/task10.html',
+                  {'table_name': table_name})
+
+
+def task10_result(request):
+    region = request.GET.get('region')
+    construction = request.GET.get('construction')
+
+    table_name = "Строительная организация"
+    table_columns = (
+        'Название технологии',
+        'Дата начала работ',
+        'Дата окончания работ',
+        'Дата начала работ факт',
+        'Дата окончания работ факт'
+    )
+
+    table_rows = execute_raw_sql('''
+    SELECT object_technology.technology_id,
+    timetable.date_technology_start,
+    timetable.date_technology_end,
+    timetable.date_technology_fact_start,
+    timetable.date_technology_fact_end
+    FROM timetable
+    INNER JOIN object_technology ON
+    timetable.object_technology_id = object_technology.id
+    WHERE
+    date_technology_start > date_technology_fact_start OR
+    date_technology_end < date_technology_fact_end
+    ''')
+
+    if region is not None:
+        table_name = "Участок"
+        if not table_exist(table_name='region', pk_name='cadastral_number',
+                           id=region, is_string=True):
+            raise Http404('Участка с данным номером не существует')
+
+        table_columns = (
+            'Название технологии',
+            'Дата начала работ',
+            'Дата окончания работ',
+            'Дата начала работ факт',
+            'Дата окончания работ факт'
+        )
+
+        table_rows = execute_raw_sql(f'''
+        SELECT object_technology.technology_id,
+        timetable.date_technology_start,
+        timetable.date_technology_end,
+        timetable.date_technology_fact_start,
+        timetable.date_technology_fact_end
+        FROM region
+        INNER JOIN building ON region.cadastral_number = building.region_id
+        INNER JOIN timetable ON building.id = timetable.building_id
+        INNER JOIN object_technology ON
+        timetable.object_technology_id = object_technology.id
+        WHERE region.cadastral_number = '{region}' AND
+        (date_technology_start > date_technology_fact_start OR
+        date_technology_end < date_technology_fact_end)
+        ''')
+
+    if construction is not None:
+        table_name = "Строительное управление"
+        if not table_exist(table_name='construction', pk_name='id',
+                           id=construction, is_string=False):
+            raise Http404('Участка с данным номером не существует')
+
+        table_columns = (
+            'Название технологии',
+            'Дата начала работ',
+            'Дата окончания работ',
+            'Дата начала работ факт',
+            'Дата окончания работ факт'
+        )
+
+        table_rows = execute_raw_sql(f'''
+        SELECT object_technology.technology_id,
+        timetable.date_technology_start,
+        timetable.date_technology_end,
+        timetable.date_technology_fact_start,
+        timetable.date_technology_fact_end
+        FROM construction
+        INNER JOIN region ON construction.id = region.construction_id
+        INNER JOIN building ON region.cadastral_number = building.region_id
+        INNER JOIN timetable ON building.id = timetable.building_id
+        INNER JOIN object_technology ON
+        timetable.object_technology_id = object_technology.id
+        WHERE construction.id = {construction} AND
+        (date_technology_start > date_technology_fact_start OR
+        date_technology_end < date_technology_fact_end)
+        ''')
+
+    return render(request,
+                  'task/result.html',
+                  {'table_name': table_name,
+                   'table_columns': table_columns,
+                   'table_rows': table_rows})
 
 
 def task11(request):
-    pass
+    table_name = 'Задание 11'
+    return render(request,
+                  'task/task11.html',
+                  {'table_name': table_name})
+
+
+def task11_result(request):
+    region = request.GET.get('region')
+    construction = request.GET.get('construction')
+
+    table_name = "Строительная организация"
+    table_columns = (
+        'Строительный объект',
+        'Название материала',
+        'Количество',
+        'Количество факт',
+        'Цена',
+        'Цена факт'
+    )
+
+    table_rows = execute_raw_sql('''
+    SELECT timetable.building_id,
+    estimation.material_id,
+    estimation.count, estimation_fact.count,
+    estimation.price, estimation_fact.price
+    FROM timetable
+    INNER JOIN estimation ON timetable.id = estimation.timetable_id
+    INNER JOIN estimation_fact ON timetable.id = estimation_fact.timetable_id
+    WHERE estimation.material_id = estimation_fact.material_id AND
+    (estimation.count < estimation_fact.count OR
+    estimation.price < estimation_fact.price)
+    ''')
+
+    if region is not None:
+        table_name = "Участок"
+        if not table_exist(table_name='region', pk_name='cadastral_number',
+                           id=region, is_string=True):
+            raise Http404('Участка с данным номером не существует')
+
+        table_columns = (
+            'Строительный объект',
+            'Название материала',
+            'Количество',
+            'Количество факт',
+            'Цена',
+            'Цена факт'
+        )
+
+        table_rows = execute_raw_sql(f'''
+        SELECT timetable.building_id,
+        estimation.material_id,
+        estimation.count, estimation_fact.count as count_fact,
+        estimation.price, estimation_fact.price as price_fact
+        FROM region
+        INNER JOIN building ON region.cadastral_number = building.region_id
+        INNER JOIN timetable ON building.id = timetable.building_id
+        INNER JOIN estimation ON timetable.id = estimation.timetable_id
+        INNER JOIN estimation_fact
+        ON timetable.id = estimation_fact.timetable_id
+        WHERE region.cadastral_number = {region} AND
+        estimation.material_id = estimation_fact.material_id AND
+        (estimation.count < estimation_fact.count OR
+        estimation.price < estimation_fact.price)
+        ''')
+
+    if construction is not None:
+        table_name = "Строительное управление"
+        if not table_exist(table_name='construction', pk_name='id',
+                           id=construction, is_string=False):
+            raise Http404('Участка с данным номером не существует')
+
+        table_columns = (
+            'Строительный объект',
+            'Название материала',
+            'Количество',
+            'Количество факт',
+            'Цена',
+            'Цена факт'
+        )
+
+        table_rows = execute_raw_sql(f'''
+        SELECT timetable.building_id,
+        estimation.material_id,
+        estimation.count, estimation_fact.count as count_fact,
+        estimation.price, estimation_fact.price as price_fact
+        FROM construction
+        INNER JOIN region ON construction.id = region.construction_id
+        INNER JOIN building ON region.cadastral_number = building.region_id
+        INNER JOIN timetable ON building.id = timetable.building_id
+        INNER JOIN estimation ON timetable.id = estimation.timetable_id
+        INNER JOIN estimation_fact
+        ON timetable.id = estimation_fact.timetable_id
+        WHERE construction.id = {construction} AND
+        estimation.material_id = estimation_fact.material_id AND
+        (estimation.count < estimation_fact.count OR
+        estimation.price < estimation_fact.price)
+        ''')
+
+    return render(request,
+                  'task/result.html',
+                  {'table_name': table_name,
+                   'table_columns': table_columns,
+                   'table_rows': table_rows})
 
 
 def task12(request):
-    pass
+    table_name = 'Задание 12'
+    return render(request,
+                  'task/task12.html',
+                  {'table_name': table_name})
+
+
+def task12_result(request):
+    brigade = request.GET.get('brigade')
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    if brigade is not None:
+        table_name = "Бригада"
+        if not table_exist(table_name='brigade', pk_name='id',
+                           id=brigade, is_string=False):
+            raise Http404('Участка с данным номером не существует')
+
+        table_columns = (
+            'Строительный объект',
+            'Название технологии',
+            'Дата начала',
+            'Дата окончания'
+        )
+
+        table_rows = execute_raw_sql(f'''
+        SELECT building_id, object_technology.technology_id,
+        date_technology_start, date_technology_end
+        FROM timetable
+        INNER JOIN object_technology ON
+        object_technology.id = timetable.object_technology_id
+        WHERE brigade_id = {brigade} AND
+        date_technology_start >= '{start_date}' AND
+        date_technology_end <= '{end_date}'
+        ''')
+
+    return render(request,
+                  'task/result.html',
+                  {'table_name': table_name,
+                   'table_columns': table_columns,
+                   'table_rows': table_rows})
 
 
 def task13(request):
-    pass
+    table_name = 'Задание 13'
+    rows = execute_raw_sql('''
+    SELECT name FROM technology
+    ''')
+    return render(request,
+                  'task/task13.html',
+                  {'table_name': table_name,
+                   'rows': rows})
+
+
+def task13_result(request):
+    technology_name = request.GET.get('technology_name')
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    
+    table_name = 'Бригады'
+    table_columns = (
+        'Номер бригады', 'Строительный объект',
+        'Дата начала работ', 'Дата окончания работ'
+    )
+    
+    table_rows = execute_raw_sql(f'''
+    SELECT timetable.brigade_id,
+    timetable.building_id, timetable.date_technology_start,
+    timetable.date_technology_end
+    FROM timetable
+    INNER JOIN object_technology ON
+    timetable.object_technology_id = object_technology.id
+    WHERE object_technology.technology_id = '{technology_name}' AND
+    date_technology_start >= '{start_date}' AND
+    date_technology_end <= '{end_date}'
+    ''')
+
+    return render(request,
+                  'task/result.html',
+                  {'table_name': table_name,
+                   'table_columns': table_columns,
+                   'table_rows': table_rows})
 
 
 class EntityView(View):

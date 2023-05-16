@@ -1,5 +1,4 @@
-from django.urls import path
-
+from django.urls import path, include
 from . import views
 from .views import EquipmentTypeView, EngineeringPositionView
 from .views import ObjectTypeView, CustomerView, EmployeeView, ConstructionView
@@ -12,6 +11,7 @@ from .views import EquipmentBuildingView, TimetableView, EstimationView
 from .views import EstimationFactView
 
 urlpatterns = [
+    path("signup/", views.SignUp.as_view(), name="signup"),
     path('', views.index, name='index'),
     path('entity/', views.entities, name='entity'),
     path('tasks/', views.tasks, name='tasks'),
@@ -31,10 +31,15 @@ urlpatterns = [
     path('task-8/', views.task8, name='task_8'),
     path('task-8/result/', views.task8_result, name='task_8_result'),
     path('task-9/', views.task9, name='task_9'),
+    path('task-9/result/', views.task9_result, name='task_9_result'),
     path('task-10/', views.task10, name='task_10'),
+    path('task-10/result/', views.task10_result, name='task_10_result'),
     path('task-11/', views.task11, name='task_11'),
+    path('task-11/result/', views.task11_result, name='task_11_result'),
     path('task-12/', views.task12, name='task_12'),
-    path('task-13/', views.task12, name='task_13'),
+    path('task-12/result/', views.task12_result, name='task_12_result'),
+    path('task-13/', views.task13, name='task_13'),
+    path('task-13/result/', views.task13_result, name='task_13_result'),
 
     path('equipment-type/',
          EquipmentTypeView.as_view(),

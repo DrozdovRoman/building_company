@@ -10,8 +10,7 @@
 
 {% block content %}
 
-<h2>Строительный объект</h2>
-<form action="{% url 'task_6_result' %}" method="get">
+<form action="{% url 'task_12_result' %}" method="get">
     <div class="form-group">
         <label for="start-date">Начальная дата</label>
         <input type="text" id="start-date" name="start_date" class="form-control" required>
@@ -21,8 +20,8 @@
         <input type="text" id="end-date" name="end_date" class="form-control" required>
     </div>
     <div class="form-group">
-        <label for="building">Строительный объект</label>
-        <input type="number" id="building" name="building" class="form-control" required min="0">
+        <label for="brigade">Номер бригады</label>
+        <input type="number" id="brigade" name="brigade" class="form-control" required min="0">
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
 </form>

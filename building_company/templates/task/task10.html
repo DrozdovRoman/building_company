@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ table_name }}
+{% endblock %}
+
+{% block header %}
+{{ table_name }}
+{% endblock %}
+
+{% block content %}
+
+    <form action="{% url 'task_10_result' %}" method="get">
+        <div class="input-group">
+            <h2 class = 'mr-4'>Строительная организация</h2>
+            <div class="input-group-append">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+        
+    </form>
+
+    <h2>Участок</h2>
+    <form action="{% url 'task_10_result' %}" method="get">
+        <div class="input-group">
+            <input type="region" id="region" name="region" class="form-control" required min="0">
+            <div class="input-group-append">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </form>
+
+
+    <h2>Строительное управление</h2>
+    <form action="{% url 'task_10_result' %}" method="get">
+        <div class="input-group">
+            <input type="construction" id="construction" name="construction" class="form-control" required min="0">
+            <div class="input-group-append">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </form>
+
+{% endblock %}
